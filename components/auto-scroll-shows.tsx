@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Youtube, Twitch, Instagram, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { FireRating } from "@/components/fire-rating"
+import EzoicAd from "./ezoic-ad"
+import { AdPlaceholders, destroyPlaceholders, showAds } from "@/lib/ezoic"
 
 // Platform icon mapping
 const PlatformIcon = ({ platform }: { platform: string }) => {
@@ -57,15 +59,20 @@ interface AutoScrollShowsProps {
   visible: boolean
 }
 
-// Mock ads - in a real app, these would come from your backend
-const mockAds: Ad[] = [
-  // Empty array - we'll use the logo placeholder
-]
+// The scroll placeholders we'll use for Ezoic infinite scroll ads
+const scrollPlaceholders = [
+  AdPlaceholders.SCROLL_1,
+  AdPlaceholders.SCROLL_2,
+  AdPlaceholders.SCROLL_3,
+  AdPlaceholders.SCROLL_4,
+  AdPlaceholders.SCROLL_5
+];
 
 export default function AutoScrollShows({ shows, visible }: AutoScrollShowsProps) {
   const router = useRouter()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [scrollPosition, setScrollPosition] = useState(0)
+  const [activePlaceholders, setActivePlaceholders] = useState<number[]>([]);
 
   // Sort shows to prioritize live shows
   const sortedShows = [...shows].sort((a, b) => {
@@ -107,6 +114,22 @@ export default function AutoScrollShows({ shows, visible }: AutoScrollShowsProps
     }
   }, [scrollPosition])
 
+  // Clean up Ezoic ads when component unmounts
+  useEffect(() => {
+    return () => {
+      if (activePlaceholders.length > 0) {
+        destroyPlaceholders(...activePlaceholders);
+      }
+    };
+  }, [activePlaceholders]);
+
+  // Manage active placeholders
+  const trackAdPlaceholder = (id: number) => {
+    setActivePlaceholders(prev => 
+      prev.includes(id) ? prev : [...prev, id]
+    );
+  };
+
   const handleCardClick = (show: Show) => {
     router.push(`/shows/${show.id}`)
   }
@@ -118,37 +141,38 @@ export default function AutoScrollShows({ shows, visible }: AutoScrollShowsProps
   if (!visible) return null
 
   // Create a 2D array for the grid layout with ads inserted
-  const createShowGridWithAds = (shows: Show[], ads: Ad[]) => {
-    const grid: (Show | Ad | "placeholder")[][] = [[], []]
+  const createShowGridWithAds = (shows: Show[]) => {
+    const grid: (Show | "ezoic-ad" | "placeholder")[][] = [[], []]
+    
+    let currentPlaceholderIndex = 0;
 
     // Insert shows into grid
     shows.forEach((show, index) => {
       const columnIndex = index % 2
       grid[columnIndex].push(show)
 
-      // Randomly insert ads or placeholders (approximately 1 ad per 4 shows)
-      if (Math.random() < 0.25) {
-        const adOrPlaceholder = ads.length > 0 ? ads[Math.floor(Math.random() * ads.length)] : "placeholder"
-
+      // Insert Ezoic ad after every 4 shows (approximately)
+      if (index > 0 && index % 4 === 0 && currentPlaceholderIndex < scrollPlaceholders.length) {
         // Insert into the opposite column for staggering effect
         const oppositeColumn = columnIndex === 0 ? 1 : 0
-        grid[oppositeColumn].push(adOrPlaceholder)
+        grid[oppositeColumn].push("ezoic-ad")
+        currentPlaceholderIndex++;
       }
     })
 
-    // Ensure at least one ad/placeholder in each column
-    if (!grid[0].some((item) => item === "placeholder" || (item !== "placeholder" && "imageUrl" in item))) {
-      grid[0].splice(Math.floor(Math.random() * grid[0].length), 0, "placeholder")
+    // Ensure at least one ad in each column
+    if (!grid[0].some(item => typeof item === "string" && item === "ezoic-ad")) {
+      grid[0].splice(Math.min(2, grid[0].length), 0, "ezoic-ad")
     }
 
-    if (!grid[1].some((item) => item === "placeholder" || (item !== "placeholder" && "imageUrl" in item))) {
-      grid[1].splice(Math.floor(Math.random() * grid[1].length), 0, "placeholder")
+    if (!grid[1].some(item => typeof item === "string" && item === "ezoic-ad")) {
+      grid[1].splice(Math.min(2, grid[1].length), 0, "ezoic-ad")
     }
 
     return grid
   }
 
-  const showGrid = createShowGridWithAds(sortedShows, mockAds)
+  const showGrid = createShowGridWithAds(sortedShows)
 
   return (
     <div className="w-full h-[600px] overflow-y-hidden py-4" ref={scrollContainerRef}>
@@ -164,8 +188,8 @@ export default function AutoScrollShows({ shows, visible }: AutoScrollShowsProps
           >
             {column.map((item, itemIndex) => {
               // Show card
-              if (item !== "placeholder" && "platform" in item) {
-                const show = item as Show
+              if (typeof item !== "string" && "platform" in item) {
+                const show = item;
                 return (
                   <Card
                     key={`show-${show.id}`}
@@ -231,58 +255,25 @@ export default function AutoScrollShows({ shows, visible }: AutoScrollShowsProps
                   </Card>
                 )
               }
-              // Ad card
-              else if (item !== "placeholder" && "imageUrl" in item) {
-                const ad = item as Ad
+              // Ezoic ad placeholder
+              else if (typeof item === "string" && item === "ezoic-ad") {
+                const placeholderId = scrollPlaceholders[itemIndex % scrollPlaceholders.length];
                 return (
                   <Card
-                    key={`ad-${ad.id}`}
-                    className="flex-shrink-0 overflow-hidden border-2 border-[#FF5F00] p-2 show-card group cursor-pointer"
-                    onClick={() => handleAdClick(ad)}
+                    key={`ezoic-ad-${colIndex}-${itemIndex}`}
+                    className="flex-shrink-0 overflow-hidden border border-muted p-0"
                   >
-                    <CardContent className="p-0">
-                      <div className="relative">
-                        <div className="aspect-video relative">
-                          <Image src={ad.imageUrl || "/placeholder.svg"} alt={ad.title} fill className="object-cover" />
-                        </div>
-                        <Badge className="absolute top-2 right-2 bg-blue-500 text-white">AD</Badge>
-                      </div>
-                      <div className="p-4">
-                        <p className="font-medium">{ad.title}</p>
-                      </div>
-                    </CardContent>
+                    <EzoicAd 
+                      id={placeholderId}
+                      className="aspect-video w-full"
+                      onAdLoaded={() => trackAdPlaceholder(placeholderId)}
+                    />
                   </Card>
                 )
               }
-              // Placeholder ad card with logo
+              // Empty placeholder (shouldn't normally happen)
               else {
-                return (
-                  <Card
-                    key={`placeholder-${colIndex}-${itemIndex}`}
-                    className="flex-shrink-0 overflow-hidden border-2 border-[#FF5F00] p-2 show-card group cursor-pointer"
-                    onClick={() => router.push("/join")}
-                  >
-                    <CardContent className="p-0">
-                      <div className="relative">
-                        <div className="aspect-video relative bg-black/50 flex items-center justify-center">
-                          <div className="relative w-32 h-32">
-                            <Image
-                              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/BangerBoardImageLogo-SvaIEbajz66iZh24Mt6YMlohGEm9tm.png"
-                              alt="BangerBoard Logo"
-                              fill
-                              className="object-contain"
-                            />
-                          </div>
-                        </div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <h3 className="font-banger text-2xl text-green-500 text-center drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
-                            Join to be a member
-                          </h3>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
+                return null;
               }
             })}
           </div>
