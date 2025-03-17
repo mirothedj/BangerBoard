@@ -33,6 +33,13 @@ export interface Review {
   url: string
 }
 
+// Add interfaces for ad tracking
+interface AdStats {
+  id: number;
+  impressions: number;
+  clicks: number;
+}
+
 // Sample data - in a real app, this would be in your database
 let SHOWS: Show[] = [
   {
@@ -130,6 +137,15 @@ const REVIEWS: Review[] = [
   },
 ]
 
+// Sample ad stats data
+let AD_STATS: AdStats[] = [
+  {
+    id: 1,
+    impressions: 0,
+    clicks: 0
+  }
+];
+
 // Example function to get shows with thumbnails from the database
 export async function getShows(): Promise<Show[]> {
   // In a real app, this would query your database
@@ -204,5 +220,31 @@ export async function updateShowWithScrapedData(showId: number, data: Partial<Sh
   }
 
   return SHOWS[showIndex]
+}
+
+export async function incrementAdImpressions(adId: number): Promise<void> {
+  const adStats = AD_STATS.find(stat => stat.id === adId);
+  if (adStats) {
+    adStats.impressions += 1;
+  } else {
+    AD_STATS.push({
+      id: adId,
+      impressions: 1,
+      clicks: 0
+    });
+  }
+}
+
+export async function incrementAdClicks(adId: number): Promise<void> {
+  const adStats = AD_STATS.find(stat => stat.id === adId);
+  if (adStats) {
+    adStats.clicks += 1;
+  } else {
+    AD_STATS.push({
+      id: adId,
+      impressions: 0,
+      clicks: 1
+    });
+  }
 }
 
