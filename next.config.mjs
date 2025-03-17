@@ -21,6 +21,14 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  // Added for GitHub Pages deployment
+  output: 'export',
+  // The folder where the static site will be generated
+  distDir: 'out',
+  // Use basePath if you're not using a custom domain
+  basePath: process.env.NODE_ENV === 'production' ? '/BangerBoard' : '',
+  // Use assetPrefix if you're not using a custom domain
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/BangerBoard' : '',
 }
 
 mergeConfig(nextConfig, userConfig)
