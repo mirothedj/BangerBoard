@@ -1,5 +1,6 @@
 name: Deploy Next.js to GitHub Pages
 
+# Trigger deployment on push to main branch
 on:
   push:
     branches: [ "main" ]
