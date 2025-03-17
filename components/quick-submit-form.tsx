@@ -1,22 +1,8 @@
 "use client"
 
 import { Youtube, Instagram, Twitch } from "lucide-react"
-import type React from "react"
-import { useState } from "react"
-import { submitResource } from "@/app/actions/submissions"
-import { useActionState } from "react"
 
-export default function QuickSubmitForm() {
-  const [url, setUrl] = useState("")
-  const [formState, formAction, isPending] = useActionState(submitResource, {
-    success: false,
-    message: "",
-  })
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUrl(e.target.value)
-  }
-
+export default function SocialMediaLinks() {
   return (
     <footer className="border border-border/50 bg-black/60 backdrop-blur-md mt-auto p-4 rounded-lg shadow-lg">
       <div className="max-w-md mx-auto">
@@ -63,7 +49,6 @@ export default function QuickSubmitForm() {
             </div>
           </a>
         </div>
-        <p className="text-xs text-center text-muted-foreground mt-4">Connect with BangerBoard on social media</p>
       </div>
     </footer>
   )
