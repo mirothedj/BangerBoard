@@ -1,8 +1,9 @@
 import Header from "@/components/header"
-import LoginModal from "@/components/login-modal"
+import EnhancedLoginModal from "@/components/enhanced-login-modal"
 import QuickSubmitForm from "@/components/quick-submit-form"
 import { ModeToggle } from "@/components/mode-toggle"
 import { getShows } from "@/lib/db"
+import LiveShowsBar from "@/components/live-shows-bar"
 import HomeContent from "@/components/home-content"
 
 export default async function Home() {
@@ -12,91 +13,33 @@ export default async function Home() {
     <main className="min-h-screen flex flex-col">
       <Header />
 
-      {/* Tagline */}
-      <div className="w-full text-center pt-4">
-        <p className="text-center text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">
-          Find, Rank, Feedback &amp; Review - a network list your fav sources of music creators, artists, DJs, hosts,
-          shows, brands and most of all Fans!
-        </p>
-      </div>
-
-      {/* Glass panel with neon LED effect */}
-      <div className="w-full relative overflow-hidden" style={{ height: "30px", marginBottom: "-5px", zIndex: 1 }}>
-        <div
-          className="absolute bottom-0 w-full"
-          style={{
-            height: "30px",
-            background: "rgba(10, 10, 20, 0.3)",
-            backdropFilter: "blur(5px)",
-            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
-            boxShadow: "0 -5px 15px rgba(255, 60, 0, 0.3)",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          {/* Neon LED rope effect with fallback to logo */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: "100%",
-              background: "linear-gradient(0deg, #ff3c00 0%, transparent 70%)",
-              opacity: 0.7,
-              boxShadow: "0 0 10px 2px #ff3c00, 0 0 20px 5px rgba(255, 60, 0, 0.5)",
-              animation: "waveRadiate 3s ease-in-out infinite",
-              transform: "translateY(50%)",
-              transformOrigin: "bottom",
-            }}
-          />
-          {/* Additional wave layers for depth */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: "100%",
-              background: "linear-gradient(0deg, #ff7e00 0%, transparent 70%)",
-              opacity: 0.5,
-              boxShadow: "0 0 8px 1px #ff7e00",
-              animation: "waveRadiate 3s ease-in-out infinite 0.5s",
-              transform: "translateY(50%)",
-              transformOrigin: "bottom",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: "100%",
-              background: "linear-gradient(0deg, #ff5500 0%, transparent 70%)",
-              opacity: 0.3,
-              boxShadow: "0 0 5px 1px #ff5500",
-              animation: "waveRadiate 3s ease-in-out infinite 1s",
-              transform: "translateY(50%)",
-              transformOrigin: "bottom",
-            }}
-          />
+      <div className="w-full border-b border-border/30 bg-gradient-to-b from-background to-background/50">
+        <div className="container mx-auto px-4 lg:px-8 py-12 lg:py-16">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif tracking-tight text-balance text-center mb-4">
+            Discover the Best Live Music Shows
+          </h2>
+          <p className="text-center text-muted-foreground max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+            A community-driven platform to find, rate, and review music shows from creators, artists, DJs, and hosts
+            across all platforms
+          </p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 flex-1 relative" style={{ zIndex: -2 }}>
+      <LiveShowsBar shows={shows} />
+
+      <div className="container mx-auto px-4 lg:px-8 py-8 flex-1 relative">
         <HomeContent shows={shows} />
       </div>
 
-      <div className="container mx-auto px-4 py-6 border-t border-border/30">
+      <div className="container mx-auto px-4 lg:px-8 py-8 border-t border-border/30">
         <QuickSubmitForm />
       </div>
 
-      <div className="fixed bottom-4 right-4">
+      <div className="fixed bottom-6 right-6 z-40">
         <ModeToggle />
       </div>
 
-      <LoginModal />
+      <EnhancedLoginModal />
     </main>
   )
 }

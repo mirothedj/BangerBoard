@@ -20,10 +20,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        display: ["var(--font-permanent-marker)"],
-        stencil: ["var(--font-rubik-mono-one)"],
         sans: ["var(--font-inter)"],
-        banger: ["var(--font-bangers)"],
+        serif: ["var(--font-playfair)"],
       },
       colors: {
         border: "hsl(var(--border))",

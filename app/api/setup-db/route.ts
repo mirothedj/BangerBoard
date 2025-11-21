@@ -9,13 +9,13 @@ export async function GET() {
     if (result.success) {
       return NextResponse.json({
         success: true,
-        message: "Database setup completed successfully (includes meets_criteria field)",
+        message: "Database setup completed successfully",
       })
     } else {
       return NextResponse.json(
         {
           success: false,
-          error: 'error' in result ? result.error : "Unknown error during database setup",
+          error: result.error || "Unknown error during database setup",
         },
         { status: 500 },
       )

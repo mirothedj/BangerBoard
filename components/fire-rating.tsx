@@ -1,21 +1,18 @@
 "use client"
 
-interface MicRatingProps {
+interface FireRatingProps {
   rating: number
   interactive?: boolean
   onRatingChange?: (rating: number) => void
+  size?: "sm" | "md"
 }
 
-// Rename the component to FireRating
-export function FireRating({ rating, interactive = false, onRatingChange }: MicRatingProps) {
-  // Round to nearest 1.0 (no half ratings with fire emojis)
+export function FireRating({ rating, interactive = false, onRatingChange, size = "md" }: FireRatingProps) {
   const roundedRating = Math.round(rating)
 
-  // Create array of 6 fire emojis (instead of 5 mics)
   const fires = Array.from({ length: 6 }, (_, i) => {
     const value = i + 1
 
-    // Determine fire color based on value
     let color = ""
     let extraClasses = ""
 
@@ -42,7 +39,7 @@ export function FireRating({ rating, interactive = false, onRatingChange }: MicR
     return (
       <span
         key={value}
-        className={`${color} ${extraClasses} ${interactive ? "cursor-pointer" : ""}`}
+        className={`${color} ${extraClasses} ${interactive ? "cursor-pointer" : ""} ${size === "sm" ? "text-xs" : ""}`}
         onClick={() => {
           if (interactive && onRatingChange) {
             onRatingChange(value)
