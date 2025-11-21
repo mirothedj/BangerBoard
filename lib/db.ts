@@ -34,10 +34,29 @@ export interface Review {
 }
 
 // Add interfaces for ad tracking
-interface AdStats {
-  id: number;
-  impressions: number;
-  clicks: number;
+export interface AdStats {
+  id: number
+  impressions: number
+  clicks: number
+}
+
+export interface Advertisement {
+  id: number
+  title: string
+  description: string
+  imageUrl: string
+  linkUrl: string
+  stats: AdStats
+}
+
+export interface AdReview {
+  id: number
+  adId: number
+  userId: string
+  userName: string
+  rating: number
+  comment: string
+  createdAt: string
 }
 
 // Sample data - in a real app, this would be in your database
@@ -138,13 +157,38 @@ const REVIEWS: Review[] = [
 ]
 
 // Sample ad stats data
-let AD_STATS: AdStats[] = [
+const AD_STATS: AdStats[] = [
   {
     id: 1,
     impressions: 0,
-    clicks: 0
-  }
-];
+    clicks: 0,
+  },
+]
+
+// Sample advertisement data
+const ADVERTISEMENTS: Advertisement[] = [
+  {
+    id: 1,
+    title: "New Music Release",
+    description: "Discover the latest music from your favorite artists",
+    imageUrl: "https://example.com/new-music-release.jpg",
+    linkUrl: "https://example.com/new-music",
+    stats: AD_STATS[0],
+  },
+]
+
+// Sample ad review data
+const AD_REVIEWS: AdReview[] = [
+  {
+    id: 1,
+    adId: 1,
+    userId: "user123",
+    userName: "John Doe",
+    rating: 5,
+    comment: "Great ad, really excited about the new music release!",
+    createdAt: new Date().toISOString(),
+  },
+]
 
 // Example function to get shows with thumbnails from the database
 export async function getShows(): Promise<Show[]> {
@@ -223,27 +267,67 @@ export async function updateShowWithScrapedData(showId: number, data: Partial<Sh
 }
 
 export async function incrementAdImpressions(adId: number): Promise<void> {
-  const adStats = AD_STATS.find(stat => stat.id === adId);
+  const adStats = AD_STATS.find((stat) => stat.id === adId)
   if (adStats) {
-    adStats.impressions += 1;
+    adStats.impressions += 1
   } else {
     AD_STATS.push({
       id: adId,
       impressions: 1,
-      clicks: 0
-    });
+      clicks: 0,
+    })
   }
 }
 
 export async function incrementAdClicks(adId: number): Promise<void> {
-  const adStats = AD_STATS.find(stat => stat.id === adId);
+  const adStats = AD_STATS.find((stat) => stat.id === adId)
   if (adStats) {
-    adStats.clicks += 1;
+    adStats.clicks += 1
   } else {
     AD_STATS.push({
       id: adId,
       impressions: 0,
-      clicks: 1
-    });
+      clicks: 1,
+    })
   }
+}
+
+// New functions for advertisements
+export async function getAdvertisements(): Promise<Advertisement[]> {
+  // Simulate database delay
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  return ADVERTISEMENTS
+}
+
+export async function getAdvertisementById(adId: number): Promise<Advertisement | null> {
+  // Simulate database delay
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  return ADVERTISEMENTS.find((ad) => ad.id === adId) || null
+}
+
+export async function addAdvertisement(ad: Omit<Advertisement, "id">): Promise<Advertisement> {
+  const newId = Math.max(...ADVERTISEMENTS.map((a) => a.id), 0) + 1
+  const newAdvertisement = { ...ad, id: newId }
+  ADVERTISEMENTS.push(newAdvertisement)
+  return newAdvertisement
+}
+
+// New functions for ad reviews
+export async function getAdReviews(): Promise<AdReview[]> {
+  // Simulate database delay
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  return AD_REVIEWS
+}
+
+export async function getAdReviewsByAdId(adId: number): Promise<AdReview[]> {
+  // Simulate database delay
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  return AD_REVIEWS.filter((review) => review.adId === adId)
+}
+
+export async function addAdReview(review: Omit<AdReview, "id">): Promise<AdReview> {
+  const newId = Math.max(...AD_REVIEWS.map((r) => r.id), 0) + 1
+  const newAdReview = { ...review, id: newId }
+  AD_REVIEWS.push(newAdReview)
+  return newAdReview
 }
