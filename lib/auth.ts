@@ -73,4 +73,4 @@ export async function verifyActionToken(submissionId: string, token: string): Pr
  */
 export function hashUrl(url: string): string {
   return createHash('sha256').update(url.toLowerCase().trim()).digest('hex');
-} 
+}

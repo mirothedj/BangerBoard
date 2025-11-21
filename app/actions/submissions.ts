@@ -146,4 +146,3 @@ export async function submitResource(formData: FormData): Promise<{ success: boo
     }
   }
 }
-

@@ -116,4 +116,4 @@ function extractTwitchChannelName(url: string): string | null {
   const regExp = /^.*twitch\.tv\/([a-zA-Z0-9_]+)(?:\/.*)?$/;
   const match = url.match(regExp);
   return match ? match[1] : null;
-} 
+}

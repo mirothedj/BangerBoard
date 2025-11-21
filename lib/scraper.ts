@@ -426,4 +426,3 @@ async function scrapeTikTokShow(show: Show) {
     reviews,
   }
 }
-

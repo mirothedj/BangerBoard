@@ -17,4 +17,3 @@ export default function ShowPage({ params }: { params: { id: string } }) {
 
   return <ShowDetails show={show} />
 }
-

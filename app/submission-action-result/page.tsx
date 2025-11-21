@@ -92,4 +92,4 @@ export default function SubmissionActionResultPage() {
       </Card>
     </div>
   )
-} 
+}

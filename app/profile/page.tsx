@@ -202,4 +202,3 @@ function SocialLinks(props: any) {
   const SocialLinksComponent = require("@/components/social-links").SocialLinks
   return <SocialLinksComponent {...props} />
 }
-

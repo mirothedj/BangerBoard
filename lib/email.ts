@@ -94,4 +94,4 @@ export async function sendApprovalEmail(data: ApprovalEmailData): Promise<boolea
     console.error('Error sending approval email:', error);
     return false;
   }
-} 
+}

@@ -23,4 +23,4 @@ export default function EzoicProvider({ children }: { children: React.ReactNode 
   }, [pathname, searchParams]);
 
   return <>{children}</>;
-} 
+}

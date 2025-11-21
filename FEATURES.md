@@ -109,4 +109,4 @@ This document tracks both implemented and proposed features for BangerBoard. Eac
 - Community feedback
 
 ## Contributing Features
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to propose and contribute new features. 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to propose and contribute new features.

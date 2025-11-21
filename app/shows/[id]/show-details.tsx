@@ -200,4 +200,4 @@ export default function ShowDetails({ show }: { show: Show }) {
       </div>
     </div>
   )
-} 
+}

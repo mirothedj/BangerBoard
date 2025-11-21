@@ -13,17 +13,17 @@ This directory contains the dynamic version of BangerBoard, optimized for deploy
 
 1. Create a Vercel account at https://vercel.com
 2. Install Vercel CLI:
-   ```bash
+   \`\`\`bash
    npm i -g vercel
-   ```
+   \`\`\`
 
 3. Copy the contents of this directory to a new repository
 
 4. Deploy to Vercel:
-   ```bash
+   \`\`\`bash
    vercel login
    vercel
-   ```
+   \`\`\`
 
 ## Key Differences from Static Version
 - Maintains full database functionality
@@ -33,10 +33,10 @@ This directory contains the dynamic version of BangerBoard, optimized for deploy
 - No need for static data files
 
 ## Environment Variables Required
-```
+\`\`\`
 DATABASE_URL=your_database_url
 NEXT_PUBLIC_API_URL=your_api_url
-```
+\`\`\`
 
 ## Directory Structure
 - `/app/actions` - Server actions for database operations
@@ -56,4 +56,4 @@ Choose this version if you need:
 - Server-side processing
 - Full dynamic functionality
 
-Note: This version requires a Vercel deployment and may incur hosting costs depending on usage levels. 
+Note: This version requires a Vercel deployment and may incur hosting costs depending on usage levels.

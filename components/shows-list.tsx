@@ -344,4 +344,3 @@ function ShowCard({ show }: ShowProps) {
     </div>
   )
 }
-

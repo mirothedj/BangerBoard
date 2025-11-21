@@ -113,4 +113,4 @@ export const AdPlaceholders = {
   NATIVE_1: 301,
   NATIVE_2: 302,
   NATIVE_3: 303
-}; 
+};

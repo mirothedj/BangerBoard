@@ -20,4 +20,3 @@ export default function HomeContent({ shows }: { shows: any[] }) {
     </>
   )
 }
-

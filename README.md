@@ -22,19 +22,19 @@ Bangerboard is a platform to find, rank, and provide feedback on music creators,
 
 To run this project locally:
 
-```bash
+\`\`\`bash
 # Install dependencies
 pnpm install
 
 # Start development server
 pnpm dev
-```
+\`\`\`
 
 ## Environment Variables
 
 Create a `.env.local` file with the following variables:
 
-```
+\`\`\`
 POSTGRES_URL=
 POSTGRES_PRISMA_URL=
 POSTGRES_URL_NON_POOLING=
@@ -43,8 +43,8 @@ POSTGRES_HOST=
 POSTGRES_PASSWORD=
 POSTGRES_DATABASE=
 NEXT_PUBLIC_APP_URL=
-```
+\`\`\`
 
 ## Deployment
 
-This project is deployed on Vercel and connected to GitHub for continuous deployment. 
+This project is deployed on Vercel and connected to GitHub for continuous deployment.

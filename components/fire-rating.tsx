@@ -56,4 +56,3 @@ export function FireRating({ rating, interactive = false, onRatingChange }: MicR
 
   return <div className="flex items-center gap-0.5">{fires}</div>
 }
-

@@ -18,4 +18,4 @@ export function EzoicWrapper({ children }: { children: ReactNode }) {
       <EzoicProvider>{children}</EzoicProvider>
     </>
   )
-} 
+}

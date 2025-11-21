@@ -113,4 +113,3 @@ export function extractInstagramUsername(url: string): string | null {
 
   return null
 }
-

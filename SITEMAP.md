@@ -2,7 +2,7 @@
 
 ## Static Version (Current Implementation)
 
-```mermaid
+\`\`\`mermaid
 graph TD
     A[Home Page] --> B[Show Listings]
     A --> C[Artist Search]
@@ -17,7 +17,7 @@ graph TD
     style D fill:#dfd,stroke:#333,stroke-width:2px
     style E fill:#dfd,stroke:#333,stroke-width:2px
     style F fill:#dfd,stroke:#333,stroke-width:2px
-```
+\`\`\`
 
 ### Page Descriptions (Static)
 
@@ -45,7 +45,7 @@ graph TD
 
 ## Dynamic Version (Vercel Implementation)
 
-```mermaid
+\`\`\`mermaid
 graph TD
     A[Home Page] --> B[Show Listings]
     A --> C[Artist Search]
@@ -70,7 +70,7 @@ graph TD
     style J fill:#ffd,stroke:#333,stroke-width:2px
     style K fill:#faa,stroke:#333,stroke-width:2px
     style L fill:#faa,stroke:#333,stroke-width:2px
-```
+\`\`\`
 
 ### Additional Pages (Dynamic Version)
 
@@ -93,7 +93,7 @@ graph TD
 ## Technical Architecture
 
 ### Static Version
-```mermaid
+\`\`\`mermaid
 graph LR
     A[Client] --> B[GitHub Pages]
     B --> C[Static Assets]
@@ -105,10 +105,10 @@ graph LR
     style C fill:#dfd,stroke:#333,stroke-width:2px
     style D fill:#dfd,stroke:#333,stroke-width:2px
     style E fill:#ffd,stroke:#333,stroke-width:2px
-```
+\`\`\`
 
 ### Dynamic Version
-```mermaid
+\`\`\`mermaid
 graph LR
     A[Client] --> B[Vercel Edge]
     B --> C[Next.js Server]
@@ -122,12 +122,12 @@ graph LR
     style D fill:#ffd,stroke:#333,stroke-width:2px
     style E fill:#faa,stroke:#333,stroke-width:2px
     style F fill:#faa,stroke:#333,stroke-width:2px
-```
+\`\`\`
 
 ## Component Flow
 
 ### Static Components
-```mermaid
+\`\`\`mermaid
 graph TD
     A[Layout] --> B[Header]
     A --> C[Main Content]
@@ -145,10 +145,10 @@ graph TD
     style F fill:#ffd,stroke:#333,stroke-width:2px
     style G fill:#ffd,stroke:#333,stroke-width:2px
     style H fill:#faa,stroke:#333,stroke-width:2px
-```
+\`\`\`
 
 ### Dynamic Components
-```mermaid
+\`\`\`mermaid
 graph TD
     A[Layout] --> B[Header]
     A --> C[Main Content]
@@ -168,12 +168,12 @@ graph TD
     style G fill:#ffd,stroke:#333,stroke-width:2px
     style H fill:#faa,stroke:#333,stroke-width:2px
     style I fill:#faa,stroke:#333,stroke-width:2px
-```
+\`\`\`
 
 ## Data Flow
 
 ### Static Data Flow
-```mermaid
+\`\`\`mermaid
 graph LR
     A[Static Data] --> B[Build Process]
     B --> C[Pre-rendered Pages]
@@ -185,10 +185,10 @@ graph LR
     style C fill:#dfd,stroke:#333,stroke-width:2px
     style D fill:#ffd,stroke:#333,stroke-width:2px
     style E fill:#faa,stroke:#333,stroke-width:2px
-```
+\`\`\`
 
 ### Dynamic Data Flow
-```mermaid
+\`\`\`mermaid
 graph LR
     A[Client Request] --> B[API Route]
     B --> C[Database Query]
@@ -202,6 +202,6 @@ graph LR
     style D fill:#ffd,stroke:#333,stroke-width:2px
     style E fill:#faa,stroke:#333,stroke-width:2px
     style F fill:#faa,stroke:#333,stroke-width:2px
-```
+\`\`\`
 
-Note: This sitemap uses Mermaid.js for diagrams. View in a Markdown viewer that supports Mermaid for proper rendering. 
+Note: This sitemap uses Mermaid.js for diagrams. View in a Markdown viewer that supports Mermaid for proper rendering.

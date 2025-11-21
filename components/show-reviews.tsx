@@ -109,4 +109,3 @@ export default function ShowReviews({ showId, title = "Reviews" }: ShowReviewsPr
     </Card>
   )
 }
-

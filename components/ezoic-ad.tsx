@@ -70,4 +70,4 @@ export default function EzoicAd({ id, className, style, onAdLoaded }: EzoicAdPro
       <div className="text-sm text-muted-foreground opacity-50">Advertisement</div>
     </div>
   );
-} 
+}

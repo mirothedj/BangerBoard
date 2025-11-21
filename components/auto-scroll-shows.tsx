@@ -282,4 +282,3 @@ export default function AutoScrollShows({ shows, visible }: AutoScrollShowsProps
     </div>
   )
 }
-

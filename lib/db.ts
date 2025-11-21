@@ -247,4 +247,3 @@ export async function incrementAdClicks(adId: number): Promise<void> {
     });
   }
 }
-

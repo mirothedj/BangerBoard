@@ -11,4 +11,4 @@ export default function EzoicScript() {
   }, []);
 
   return null; // This component doesn't render anything
-} 
+}

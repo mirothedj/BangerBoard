@@ -40,4 +40,4 @@ We use GitHub issues to track public bugs. Report a bug by [opening a new issue]
 We welcome feature suggestions! Please use the [Feature Request template](https://github.com/mirothedj/BangerBoard/issues/new?template=feature_request.md) when submitting new ideas.
 
 ## License
-By contributing, you agree that your contributions will be licensed under its MIT License. 
+By contributing, you agree that your contributions will be licensed under its MIT License.

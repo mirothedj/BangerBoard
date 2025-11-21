@@ -165,4 +165,4 @@ export async function sql(strings: TemplateStringsArray, ...values: any[]) {
 export async function setupMockDatabase() {
   console.log('Setting up mock database tables');
   return { success: true };
-} 
+}
