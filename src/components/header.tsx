@@ -11,7 +11,7 @@ export function Header() {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background neo-subtle border-b border-border/30">
+    <header className="sticky top-0 z-50 w-full bg-background neo-subtle border-b border-border/30 transition-colors duration-300">
       <div className="container mx-auto flex h-20 items-center justify-between px-6">
         <div className="flex items-center gap-10">
           <Link to="/" className="flex items-center gap-3 group">
@@ -64,12 +64,12 @@ export function Header() {
         <div className="flex items-center gap-3">
           <button
             onClick={toggleTheme}
-            className="neo-raised rounded-xl p-3 bg-background hover:neo-inset transition-all"
+            className="neo-raised rounded-xl p-3 bg-background hover:neo-inset transition-all text-foreground"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? <Sun className="h-5 w-5 text-primary" /> : <Moon className="h-5 w-5 text-primary" />}
           </button>
-          <button className="neo-raised rounded-xl p-3 bg-background hover:neo-inset transition-all">
+          <button className="neo-raised rounded-xl p-3 bg-background hover:neo-inset transition-all text-foreground">
             <Search className="h-5 w-5" />
           </button>
           <div className="neo-raised rounded-xl bg-background overflow-hidden">
