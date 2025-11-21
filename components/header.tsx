@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { UserCircle, Settings, LogOut, Plus } from "lucide-react"
+import { UserCircle, Settings, LogOut, Plus, Music, Users, Briefcase } from "lucide-react"
 import { getCurrentUser, logout } from "@/lib/auth"
 import type { User } from "@/lib/auth"
 
@@ -58,7 +58,32 @@ export default function Header() {
             </h1>
           </Link>
 
-          <div className="flex-1 flex justify-center items-center max-w-md mx-auto">
+          <nav className="hidden lg:flex items-center gap-6">
+            <Link
+              href="/playlists"
+              className="text-sm font-medium hover:text-accent transition-colors flex items-center gap-2"
+            >
+              <Music className="h-4 w-4" />
+              Playlists
+            </Link>
+            <Link
+              href="/hosts"
+              className="text-sm font-medium hover:text-accent transition-colors flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" />
+              Hosts
+            </Link>
+            <Link
+              href="/creators"
+              className="text-sm font-medium hover:text-accent transition-colors flex items-center gap-2"
+            >
+              <Briefcase className="h-4 w-4" />
+              Creators
+            </Link>
+          </nav>
+          {/* </CHANGE> */}
+
+          <div className="flex-1 flex justify-center items-center max-w-md mx-auto lg:max-w-xs">
             <form
               className="flex items-center gap-2 w-full"
               onSubmit={(e) => {

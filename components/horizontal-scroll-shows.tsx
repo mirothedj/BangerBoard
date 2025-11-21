@@ -5,7 +5,7 @@ import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Youtube, Twitch, Instagram, Clock, Star } from "lucide-react"
+import { Youtube, Twitch, Instagram, Clock, Star, ChevronLeft, ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { FireRating } from "@/components/fire-rating"
 
@@ -89,23 +89,28 @@ export default function HorizontalScrollShows({ shows }: HorizontalScrollShowsPr
   const router = useRouter()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [scrollPosition, setScrollPosition] = useState(0)
+  const [scrollDirection, setScrollDirection] = useState<"left" | "right">("right")
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true)
   const animationRef = useRef<number>()
 
-  // Auto-scroll animation
   useEffect(() => {
+    if (!isAutoScrolling) return
+
     const container = scrollContainerRef.current
     if (!container) return
 
     const scroll = () => {
       setScrollPosition((prev) => {
-        const maxScroll = container.scrollWidth - container.clientWidth
-        const newPosition = prev + 0.8
+        const maxScroll = container.scrollWidth / 2 // Half because content is doubled
+        const speed = 0.8
 
-        if (newPosition >= maxScroll / 2) {
-          return 0
+        if (scrollDirection === "right") {
+          const newPosition = prev + speed
+          return newPosition >= maxScroll ? 0 : newPosition
+        } else {
+          const newPosition = prev - speed
+          return newPosition <= 0 ? maxScroll : newPosition
         }
-
-        return newPosition
       })
       animationRef.current = requestAnimationFrame(scroll)
     }
@@ -117,13 +122,18 @@ export default function HorizontalScrollShows({ shows }: HorizontalScrollShowsPr
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [])
+  }, [isAutoScrolling, scrollDirection])
 
   useEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollLeft = scrollPosition
     }
   }, [scrollPosition])
+
+  const handleDirectionChange = (direction: "left" | "right") => {
+    setScrollDirection(direction)
+    setIsAutoScrolling(true)
+  }
 
   const handleCardClick = (show: Show) => {
     router.push(`/shows/${show.id}`)
@@ -154,11 +164,33 @@ export default function HorizontalScrollShows({ shows }: HorizontalScrollShowsPr
 
   return (
     <div className="w-full overflow-hidden py-6">
-      <h3 className="text-xl font-serif tracking-tight mb-4 px-4 lg:px-0">Upcoming Shows</h3>
+      <div className="flex items-center justify-between mb-4 px-4 lg:px-0">
+        <h3 className="text-xl font-serif tracking-tight">Upcoming Shows</h3>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => handleDirectionChange("left")}
+            size="sm"
+            variant={scrollDirection === "left" ? "default" : "outline"}
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Scroll Left
+          </Button>
+          <Button
+            onClick={() => handleDirectionChange("right")}
+            size="sm"
+            variant={scrollDirection === "right" ? "default" : "outline"}
+          >
+            Scroll Right
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </div>
+      </div>
       <div
         ref={scrollContainerRef}
         className="flex gap-4 overflow-x-hidden px-4 lg:px-0"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        onMouseEnter={() => setIsAutoScrolling(false)}
+        onMouseLeave={() => setIsAutoScrolling(true)}
       >
         {content.map((item, index) => {
           const isShow = "platform" in item

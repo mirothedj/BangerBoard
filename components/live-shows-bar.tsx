@@ -5,7 +5,8 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Youtube, Twitch, Instagram } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Youtube, Twitch, Instagram, ChevronLeft, ChevronRight } from "lucide-react"
 import { FireRating } from "@/components/fire-rating"
 
 const PlatformIcon = ({ platform }: { platform: string }) => {
@@ -51,39 +52,58 @@ interface LiveShowsBarProps {
 export default function LiveShowsBar({ shows }: LiveShowsBarProps) {
   const router = useRouter()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
+  const [scrollDirection, setScrollDirection] = useState<"left" | "right">("right")
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true)
+  const animationRef = useRef<number>()
+  const [scrollPosition, setScrollPosition] = useState(0)
 
   const liveShows = shows.filter((show) => show.isLive)
-
-  const updateScrollButtons = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
-      setCanScrollLeft(scrollLeft > 0)
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
-    }
-  }
+  const doubledShows = [...liveShows, ...liveShows] // Double for seamless loop
 
   useEffect(() => {
-    updateScrollButtons()
-    const container = scrollContainerRef.current
-    if (container) {
-      container.addEventListener("scroll", updateScrollButtons)
-      return () => container.removeEventListener("scroll", updateScrollButtons)
-    }
-  }, [liveShows])
+    if (!isAutoScrolling) return
 
-  const scroll = (direction: "left" | "right") => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 320
-      scrollContainerRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    const scroll = () => {
+      setScrollPosition((prev) => {
+        const maxScroll = container.scrollWidth / 2 // Half because we doubled content
+        const speed = 0.5
+
+        if (scrollDirection === "right") {
+          const newPosition = prev + speed
+          return newPosition >= maxScroll ? 0 : newPosition
+        } else {
+          const newPosition = prev - speed
+          return newPosition <= 0 ? maxScroll : newPosition
+        }
       })
+      animationRef.current = requestAnimationFrame(scroll)
     }
+
+    animationRef.current = requestAnimationFrame(scroll)
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [isAutoScrolling, scrollDirection])
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft = scrollPosition
+    }
+  }, [scrollPosition])
+
+  const handleDirectionChange = (direction: "left" | "right") => {
+    setScrollDirection(direction)
+    setIsAutoScrolling(true)
   }
 
   const handleCardClick = (show: Show) => {
+    setIsAutoScrolling(false)
     router.push(`/shows/${show.id}`)
   }
 
@@ -91,60 +111,46 @@ export default function LiveShowsBar({ shows }: LiveShowsBarProps) {
 
   return (
     <div className="w-full border-b border-border/30 bg-gradient-to-b from-background/80 to-background/40 backdrop-blur-sm">
-      <div className="container mx-auto px-4 lg:px-8 py-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-serif tracking-tight flex items-center gap-2">
-            <span className="relative flex h-3 w-3">
+      <div className="container mx-auto px-4 lg:px-8 py-3">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-base font-serif tracking-tight flex items-center gap-2">
+            <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
             </span>
             Live Now
           </h3>
           <div className="flex gap-2">
-            <button
-              onClick={() => scroll("left")}
-              disabled={!canScrollLeft}
-              className="p-2 rounded-full bg-secondary hover:bg-secondary/80 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-              aria-label="Scroll left"
+            <Button
+              onClick={() => handleDirectionChange("left")}
+              size="sm"
+              variant={scrollDirection === "left" ? "default" : "outline"}
+              className="h-8 w-8 p-0"
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={() => scroll("right")}
-              disabled={!canScrollRight}
-              className="p-2 rounded-full bg-secondary hover:bg-secondary/80 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-              aria-label="Scroll right"
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={() => handleDirectionChange("right")}
+              size="sm"
+              variant={scrollDirection === "right" ? "default" : "outline"}
+              className="h-8 w-8 p-0"
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
         <div
           ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+          className="flex gap-3 overflow-x-hidden"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          onMouseEnter={() => setIsAutoScrolling(false)}
+          onMouseLeave={() => setIsAutoScrolling(true)}
         >
-          {liveShows.map((show) => (
+          {doubledShows.map((show, index) => (
             <Card
-              key={show.id}
-              className="flex-shrink-0 w-[280px] overflow-hidden cursor-pointer group live-show-card"
+              key={`${show.id}-${index}`}
+              className="flex-shrink-0 w-[200px] overflow-hidden cursor-pointer group live-show-card"
               onClick={() => handleCardClick(show)}
             >
               <CardContent className="p-0">
@@ -159,7 +165,7 @@ export default function LiveShowsBar({ shows }: LiveShowsBarProps) {
                     />
                   ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-muted to-background flex items-center justify-center">
-                      <div className="relative w-12 h-12">
+                      <div className="relative w-8 h-8">
                         <Image
                           src="/images/bangerboardimagelogo.png"
                           alt="BangerBoard Logo"
@@ -170,10 +176,10 @@ export default function LiveShowsBar({ shows }: LiveShowsBarProps) {
                     </div>
                   )}
 
-                  <Badge className="absolute top-2 right-2 bg-red-500 text-white border-0 live-pulse text-xs">
-                    <span className="relative flex h-2 w-2 mr-1.5">
+                  <Badge className="absolute top-1.5 right-1.5 bg-red-500 text-white border-0 live-pulse text-[10px] px-1.5 py-0.5">
+                    <span className="relative flex h-1.5 w-1.5 mr-1">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
                     </span>
                     LIVE
                   </Badge>
@@ -181,13 +187,13 @@ export default function LiveShowsBar({ shows }: LiveShowsBarProps) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
                 </div>
 
-                <div className="p-3 bg-card">
-                  <div className="flex items-center gap-2 mb-2">
+                <div className="p-2 bg-card">
+                  <div className="flex items-center gap-1.5 mb-1">
                     <PlatformIcon platform={show.platform} />
-                    <h4 className="font-medium text-sm truncate flex-1">{show.title}</h4>
+                    <h4 className="font-medium text-xs truncate flex-1">{show.title}</h4>
                     <FireRating rating={show.rating} size="sm" />
                   </div>
-                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{show.description}</p>
+                  <p className="text-[10px] text-muted-foreground line-clamp-1 leading-relaxed">{show.description}</p>
                 </div>
               </CardContent>
             </Card>
@@ -196,22 +202,19 @@ export default function LiveShowsBar({ shows }: LiveShowsBarProps) {
       </div>
 
       <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
         .live-show-card {
           animation: gentle-glow 2s ease-in-out infinite alternate;
-          box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+          box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
         }
         .live-show-card:hover {
-          box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+          box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
         }
         @keyframes gentle-glow {
           from {
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
           }
           to {
-            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
           }
         }
       `}</style>
