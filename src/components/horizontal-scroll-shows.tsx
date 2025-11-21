@@ -1,11 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useQuery } from "@/lib/mock-convex"
 import { api } from "../../convex/_generated/api"
 import { ShowCard } from "@/components/show-card"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface HorizontalScrollShowsProps {
   title: string
@@ -13,29 +11,81 @@ interface HorizontalScrollShowsProps {
 }
 
 export function HorizontalScrollShows({ title, direction: initialDirection }: HorizontalScrollShowsProps) {
-  const [direction, setDirection] = useState(initialDirection)
+  const [autoScrollDirection, setAutoScrollDirection] = useState(initialDirection)
+  const [isPaused, setIsPaused] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const scrollPosRef = useRef(0)
+  const animationRef = useRef<number>()
+
   const shows = useQuery(api.shows.list)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container || !shows) return
+
+    const handleScroll = () => {
+      const currentScroll = container.scrollLeft
+      const scrollDiff = currentScroll - scrollPosRef.current
+
+      if (Math.abs(scrollDiff) > 5) {
+        // User scrolled, detect direction
+        if (scrollDiff > 0) {
+          setAutoScrollDirection("right")
+        } else {
+          setAutoScrollDirection("left")
+        }
+        setIsPaused(true)
+        scrollPosRef.current = currentScroll
+
+        // Resume auto-scroll after 2 seconds
+        setTimeout(() => setIsPaused(false), 2000)
+      }
+    }
+
+    container.addEventListener("scroll", handleScroll)
+
+    const animate = () => {
+      if (!isPaused && container) {
+        const scrollSpeed = autoScrollDirection === "right" ? 0.5 : -0.5
+        container.scrollLeft += scrollSpeed
+
+        // Loop seamlessly
+        const maxScroll = container.scrollWidth / 2
+        if (container.scrollLeft >= maxScroll) {
+          container.scrollLeft = 0
+        } else if (container.scrollLeft <= 0) {
+          container.scrollLeft = maxScroll
+        }
+      }
+      animationRef.current = requestAnimationFrame(animate)
+    }
+
+    animationRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll)
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [shows, autoScrollDirection, isPaused])
 
   if (!shows) return null
 
-  const doubledShows = [...shows, ...shows]
-
-  const toggleDirection = () => {
-    setDirection((prev) => (prev === "left" ? "right" : "left"))
-  }
+  const doubledShows = [...shows, ...shows, ...shows]
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-4">
         <h2 className="text-2xl font-bold">{title}</h2>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={toggleDirection} className="h-8 w-8 bg-transparent">
-            {direction === "left" ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-          </Button>
-        </div>
+        <div className="text-sm text-muted-foreground">Auto-scrolling {autoScrollDirection}</div>
       </div>
-      <div className="relative overflow-hidden">
-        <div className={`flex gap-4 ${direction === "left" ? "animate-scroll-left" : "animate-scroll-right"}`}>
+      <div
+        ref={containerRef}
+        className="overflow-x-auto overflow-y-hidden scrollbar-hide"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        <div className="flex gap-4 px-4">
           {doubledShows.map((show: any, index: number) => (
             <div key={`${show._id}-${index}`} className="flex-none w-80">
               <ShowCard show={show} />

@@ -37,33 +37,13 @@
   }
 }
 
-@keyframes scroll-left {
-  from {
-    transform: translateX(0);
+/* Added scrollbar-hide utility for clean scroll areas */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
-  to {
-    transform: translateX(-50%);
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
-}
-
-@keyframes scroll-right {
-  from {
-    transform: translateX(-50%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-.animate-scroll-left {
-  animation: scroll-left 30s linear infinite;
-}
-
-.animate-scroll-right {
-  animation: scroll-right 30s linear infinite;
-}
-
-.animate-scroll-left:hover,
-.animate-scroll-right:hover {
-  animation-play-state: paused;
 }
