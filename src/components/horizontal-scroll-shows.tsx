@@ -75,19 +75,24 @@ export function HorizontalScrollShows({ title, direction: initialDirection }: Ho
   const doubledShows = [...shows, ...shows, ...shows]
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 py-4">
       <div className="flex items-center justify-between px-4">
-        <h2 className="text-2xl font-bold">{title}</h2>
-        <div className="text-sm text-muted-foreground">Auto-scrolling {autoScrollDirection}</div>
+        <h2 className="text-2xl font-bold neo-text tracking-tight">{title}</h2>
+        <div className="text-xs font-medium px-3 py-1 rounded-full neo-inset text-muted-foreground">
+          Auto-scrolling {autoScrollDirection}
+        </div>
       </div>
       <div
         ref={containerRef}
-        className="overflow-x-auto overflow-y-hidden scrollbar-hide"
+        className="overflow-x-auto overflow-y-hidden scrollbar-hide py-4"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        <div className="flex gap-4 px-4">
+        <div className="flex gap-6 px-4">
           {doubledShows.map((show: any, index: number) => (
-            <div key={`${show._id}-${index}`} className="flex-none w-80">
+            <div
+              key={`${show._id}-${index}`}
+              className="flex-none w-80 transform transition-transform hover:-translate-y-1"
+            >
               <ShowCard show={show} />
             </div>
           ))}

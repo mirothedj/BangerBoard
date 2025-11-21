@@ -5,57 +5,80 @@
 @layer base {
   :root {
     /* Light theme - neomorphic style with soft shadows */
-    --background: 220 20% 95%;
-    --foreground: 220 20% 15%;
-    --card: 220 20% 92%;
-    --card-foreground: 220 20% 15%;
-    --popover: 220 20% 92%;
-    --popover-foreground: 220 20% 15%;
+    /* Background: #e0e5ec */
+    --background: 210 29% 90%;
+    --foreground: 210 10% 20%;
+
+    /* Card: #e0e5ec (same as bg for neomorphism) */
+    --card: 210 29% 90%;
+    --card-foreground: 210 10% 20%;
+
+    --popover: 210 29% 90%;
+    --popover-foreground: 210 10% 20%;
+
     --primary: 200 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 20% 88%;
-    --secondary-foreground: 220 20% 15%;
-    --muted: 220 20% 88%;
-    --muted-foreground: 220 20% 45%;
+
+    --secondary: 210 20% 85%;
+    --secondary-foreground: 210 10% 20%;
+
+    --muted: 210 20% 85%;
+    --muted-foreground: 210 10% 45%;
+
     --accent: 200 100% 50%;
     --accent-foreground: 0 0% 100%;
+
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 20% 85%;
-    --input: 220 20% 88%;
+
+    --border: 210 20% 80%;
+    --input: 210 20% 85%;
     --ring: 200 100% 50%;
     --radius: 1rem;
 
     /* Neomorphic shadows for light theme */
-    --neo-shadow-light: rgba(255, 255, 255, 0.7);
-    --neo-shadow-dark: rgba(174, 174, 192, 0.4);
+    /* Light shadow: #ffffff */
+    --neo-shadow-light: 0 0% 100%;
+    /* Dark shadow: #a3b1c6 */
+    --neo-shadow-dark: 216 23% 71%;
   }
 
   .dark {
-    /* Dark theme - neomorphic style with cyan accents */
-    --background: 220 20% 8%;
-    --foreground: 220 10% 92%;
-    --card: 220 20% 12%;
-    --card-foreground: 220 10% 92%;
-    --popover: 220 20% 12%;
-    --popover-foreground: 220 10% 92%;
+    /* Dark theme - neomorphic style */
+    /* Background: #242424 */
+    --background: 0 0% 14%;
+    --foreground: 0 0% 90%;
+
+    --card: 0 0% 14%;
+    --card-foreground: 0 0% 90%;
+
+    --popover: 0 0% 14%;
+    --popover-foreground: 0 0% 90%;
+
     --primary: 180 100% 50%;
-    --primary-foreground: 220 20% 8%;
-    --secondary: 220 20% 16%;
-    --secondary-foreground: 220 10% 92%;
-    --muted: 220 20% 16%;
-    --muted-foreground: 220 10% 60%;
+    --primary-foreground: 0 0% 14%;
+
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 60%;
+
     --accent: 180 100% 50%;
-    --accent-foreground: 220 20% 8%;
+    --accent-foreground: 0 0% 14%;
+
     --destructive: 0 70% 50%;
-    --destructive-foreground: 220 10% 92%;
-    --border: 220 20% 20%;
-    --input: 220 20% 16%;
+    --destructive-foreground: 0 0% 90%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 18%;
     --ring: 180 100% 50%;
 
     /* Neomorphic shadows for dark theme */
-    --neo-shadow-light: rgba(50, 50, 70, 0.5);
-    --neo-shadow-dark: rgba(0, 0, 0, 0.5);
+    /* Light shadow: #303030 */
+    --neo-shadow-light: 0 0% 19%;
+    /* Dark shadow: #181818 */
+    --neo-shadow-dark: 0 0% 9%;
   }
 }
 
@@ -81,21 +104,26 @@
 
   /* Neomorphic raised effect */
   .neo-raised {
-    box-shadow: 8px 8px 16px var(--neo-shadow-dark), -8px -8px 16px var(--neo-shadow-light);
+    @apply shadow-[8px_8px_16px_hsl(var(--neo-shadow-dark)),-8px_-8px_16px_hsl(var(--neo-shadow-light))];
   }
 
   /* Neomorphic pressed/inset effect */
   .neo-inset {
-    box-shadow: inset 4px 4px 8px var(--neo-shadow-dark), inset -4px -4px 8px var(--neo-shadow-light);
+    @apply shadow-[inset_4px_4px_8px_hsl(var(--neo-shadow-dark)),inset_-4px_-4px_8px_hsl(var(--neo-shadow-light))];
   }
 
   /* Subtle neomorphic effect */
   .neo-subtle {
-    box-shadow: 4px 4px 8px var(--neo-shadow-dark), -4px -4px 8px var(--neo-shadow-light);
+    @apply shadow-[4px_4px_8px_hsl(var(--neo-shadow-dark)),-4px_-4px_8px_hsl(var(--neo-shadow-light))];
   }
 
   /* Flat neomorphic card */
   .neo-flat {
-    box-shadow: 2px 2px 4px var(--neo-shadow-dark), -2px -2px 4px var(--neo-shadow-light);
+    @apply shadow-[2px_2px_4px_hsl(var(--neo-shadow-dark)),-2px_-2px_4px_hsl(var(--neo-shadow-light))];
+  }
+
+  /* Text shadow for depth */
+  .neo-text {
+    text-shadow: 1px 1px 2px hsl(var(--neo-shadow-dark));
   }
 }

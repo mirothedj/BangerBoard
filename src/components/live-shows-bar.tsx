@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react"
 import { useQuery } from "@/lib/mock-convex"
 import { api } from "../../convex/_generated/api"
-import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Eye } from "lucide-react"
 
@@ -69,38 +68,38 @@ export function LiveShowsBar() {
   const doubledShows = [...liveShows, ...liveShows, ...liveShows]
 
   return (
-    <div className="border-b border-border/40 bg-card/50 backdrop-blur">
+    <div className="border-b border-border/10 bg-background/80 backdrop-blur-sm neo-subtle z-10 relative">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center gap-3 mb-3">
-          <Badge variant="destructive" className="animate-pulse">
+          <Badge variant="destructive" className="animate-pulse shadow-lg shadow-red-500/20">
             LIVE NOW
           </Badge>
-          <span className="text-sm text-muted-foreground">{liveShows.length} shows streaming</span>
+          <span className="text-sm text-muted-foreground font-medium neo-text">{liveShows.length} shows streaming</span>
         </div>
         <div
           ref={containerRef}
-          className="overflow-x-auto overflow-y-hidden scrollbar-hide"
+          className="overflow-x-auto overflow-y-hidden scrollbar-hide py-2"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <div className="flex gap-4">
+          <div className="flex gap-6 px-2">
             {doubledShows.map((show: any, index: number) => (
-              <Card
+              <div
                 key={`${show._id}-${index}`}
-                className="flex-none w-48 h-28 overflow-hidden cursor-pointer group relative border-primary/50 shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(168,85,247,0.6)] transition-all"
+                className="flex-none w-48 h-28 rounded-xl overflow-hidden cursor-pointer group relative neo-raised hover:neo-flat transition-all duration-300 transform hover:scale-[1.02]"
               >
                 <img
                   src={show.thumbnailUrl || "/placeholder.svg?height=112&width=192"}
                   alt={show.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 flex flex-col justify-end">
-                  <p className="text-xs font-semibold line-clamp-1 text-white">{show.title}</p>
-                  <div className="flex items-center gap-1 text-xs text-white/80">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-3 flex flex-col justify-end">
+                  <p className="text-xs font-bold line-clamp-1 text-white drop-shadow-md">{show.title}</p>
+                  <div className="flex items-center gap-1 text-[10px] text-white/90 font-medium">
                     <Eye className="h-3 w-3" />
                     <span>{show.viewCount.toLocaleString()}</span>
                   </div>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
