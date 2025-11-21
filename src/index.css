@@ -4,26 +4,58 @@
 
 @layer base {
   :root {
-    --background: 0 0% 3%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 6%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 262 83% 58%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 64%;
-    --accent: 262 83% 58%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14%;
-    --input: 0 0% 14%;
-    --ring: 262 83% 58%;
-    --radius: 0.5rem;
+    /* Light theme - neomorphic style with soft shadows */
+    --background: 220 20% 95%;
+    --foreground: 220 20% 15%;
+    --card: 220 20% 92%;
+    --card-foreground: 220 20% 15%;
+    --popover: 220 20% 92%;
+    --popover-foreground: 220 20% 15%;
+    --primary: 200 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 20% 88%;
+    --secondary-foreground: 220 20% 15%;
+    --muted: 220 20% 88%;
+    --muted-foreground: 220 20% 45%;
+    --accent: 200 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 20% 85%;
+    --input: 220 20% 88%;
+    --ring: 200 100% 50%;
+    --radius: 1rem;
+
+    /* Neomorphic shadows for light theme */
+    --neo-shadow-light: rgba(255, 255, 255, 0.7);
+    --neo-shadow-dark: rgba(174, 174, 192, 0.4);
+  }
+
+  .dark {
+    /* Dark theme - neomorphic style with cyan accents */
+    --background: 220 20% 8%;
+    --foreground: 220 10% 92%;
+    --card: 220 20% 12%;
+    --card-foreground: 220 10% 92%;
+    --popover: 220 20% 12%;
+    --popover-foreground: 220 10% 92%;
+    --primary: 180 100% 50%;
+    --primary-foreground: 220 20% 8%;
+    --secondary: 220 20% 16%;
+    --secondary-foreground: 220 10% 92%;
+    --muted: 220 20% 16%;
+    --muted-foreground: 220 10% 60%;
+    --accent: 180 100% 50%;
+    --accent-foreground: 220 20% 8%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 220 10% 92%;
+    --border: 220 20% 20%;
+    --input: 220 20% 16%;
+    --ring: 180 100% 50%;
+
+    /* Neomorphic shadows for dark theme */
+    --neo-shadow-light: rgba(50, 50, 70, 0.5);
+    --neo-shadow-dark: rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -37,7 +69,7 @@
   }
 }
 
-/* Added scrollbar-hide utility for clean scroll areas */
+/* Neomorphic utility classes */
 @layer utilities {
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -45,5 +77,25 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Neomorphic raised effect */
+  .neo-raised {
+    box-shadow: 8px 8px 16px var(--neo-shadow-dark), -8px -8px 16px var(--neo-shadow-light);
+  }
+
+  /* Neomorphic pressed/inset effect */
+  .neo-inset {
+    box-shadow: inset 4px 4px 8px var(--neo-shadow-dark), inset -4px -4px 8px var(--neo-shadow-light);
+  }
+
+  /* Subtle neomorphic effect */
+  .neo-subtle {
+    box-shadow: 4px 4px 8px var(--neo-shadow-dark), -4px -4px 8px var(--neo-shadow-light);
+  }
+
+  /* Flat neomorphic card */
+  .neo-flat {
+    box-shadow: 2px 2px 4px var(--neo-shadow-dark), -2px -2px 4px var(--neo-shadow-light);
   }
 }
