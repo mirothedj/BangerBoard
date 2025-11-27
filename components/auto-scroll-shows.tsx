@@ -4,24 +4,23 @@ import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Youtube, Twitch, Instagram, Clock } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Youtube, Twitch, Instagram, Clock, Star } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { FireRating } from "@/components/fire-rating"
-import EzoicAd from "./ezoic-ad"
-import { AdPlaceholders, destroyPlaceholders, showAds } from "@/lib/ezoic"
 
 // Platform icon mapping
 const PlatformIcon = ({ platform }: { platform: string }) => {
   switch (platform) {
     case "youtube":
-      return <Youtube className="h-5 w-5 text-red-500" />
+      return <Youtube className="h-4 w-4" />
     case "twitch":
-      return <Twitch className="h-5 w-5 text-purple-500" />
+      return <Twitch className="h-4 w-4" />
     case "instagram":
-      return <Instagram className="h-5 w-5 text-pink-500" />
+      return <Instagram className="h-4 w-4" />
     case "tiktok":
       return (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104z"
             fill="currentColor"
@@ -51,7 +50,9 @@ interface Ad {
   id: string
   imageUrl: string
   title: string
+  description: string
   link: string
+  type: "ad" | "placeholder"
 }
 
 interface AutoScrollShowsProps {
@@ -59,20 +60,39 @@ interface AutoScrollShowsProps {
   visible: boolean
 }
 
-// The scroll placeholders we'll use for Ezoic infinite scroll ads
-const scrollPlaceholders = [
-  AdPlaceholders.SCROLL_1,
-  AdPlaceholders.SCROLL_2,
-  AdPlaceholders.SCROLL_3,
-  AdPlaceholders.SCROLL_4,
-  AdPlaceholders.SCROLL_5
-];
+// Enhanced mock ads with proper visibility
+const mockAds: Ad[] = [
+  {
+    id: "ad-1",
+    imageUrl: "/music-submission.jpg",
+    title: "Submit Your Music",
+    description: "Get reviewed by top critics",
+    link: "/submit",
+    type: "ad",
+  },
+  {
+    id: "ad-2",
+    imageUrl: "/host-signup.jpg",
+    title: "Become a Host",
+    description: "Start your review show",
+    link: "/host-signup",
+    type: "ad",
+  },
+  {
+    id: "ad-3",
+    imageUrl: "/premium-membership.png",
+    title: "Go Premium",
+    description: "Unlock advanced features",
+    link: "/premium",
+    type: "ad",
+  },
+]
 
 export default function AutoScrollShows({ shows, visible }: AutoScrollShowsProps) {
   const router = useRouter()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [scrollPosition, setScrollPosition] = useState(0)
-  const [activePlaceholders, setActivePlaceholders] = useState<number[]>([]);
+  const [containerHeight, setContainerHeight] = useState(0)
 
   // Sort shows to prioritize live shows
   const sortedShows = [...shows].sort((a, b) => {
@@ -81,205 +101,276 @@ export default function AutoScrollShows({ shows, visible }: AutoScrollShowsProps
     return 0
   })
 
-  // Auto-scroll effect (vertical, top to bottom)
+  // Calculate proper container height
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const viewportHeight = window.innerHeight
+      // Use full viewport height minus header and other elements
+      setContainerHeight(viewportHeight - 300) // Adjust based on your header height
+    }
+  }, [])
+
+  // Enhanced auto-scroll with proper loop
   useEffect(() => {
     if (!visible || !scrollContainerRef.current) return
 
     const scrollContainer = scrollContainerRef.current
-    const totalHeight = scrollContainer.scrollHeight - scrollContainer.clientHeight
+    let animationId: number
 
-    // Start from the top
-    setScrollPosition(0)
-
-    const scrollInterval = setInterval(() => {
+    const scroll = () => {
       setScrollPosition((prev) => {
-        const newPosition = prev + 2 // Increased from 1 to 2 for faster scrolling
+        const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight
+        const newPosition = prev + 1.2 // Smooth scrolling speed
 
-        // Reset to beginning when reaching the end
-        if (newPosition >= totalHeight) {
+        // Seamless loop - reset when reaching end
+        if (newPosition >= maxScroll / 2) {
           return 0
         }
 
         return newPosition
       })
-    }, 30) // Decreased from 50 to 30 for faster scrolling
+      animationId = requestAnimationFrame(scroll)
+    }
 
-    return () => clearInterval(scrollInterval)
+    animationId = requestAnimationFrame(scroll)
+
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId)
+      }
+    }
   }, [visible])
 
-  // Apply scroll position (vertical)
+  // Apply scroll position smoothly
   useEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = scrollPosition
     }
   }, [scrollPosition])
 
-  // Clean up Ezoic ads when component unmounts
-  useEffect(() => {
-    return () => {
-      if (activePlaceholders.length > 0) {
-        destroyPlaceholders(...activePlaceholders);
-      }
-    };
-  }, [activePlaceholders]);
-
-  // Manage active placeholders
-  const trackAdPlaceholder = (id: number) => {
-    setActivePlaceholders(prev => 
-      prev.includes(id) ? prev : [...prev, id]
-    );
-  };
-
   const handleCardClick = (show: Show) => {
     router.push(`/shows/${show.id}`)
   }
 
   const handleAdClick = (ad: Ad) => {
-    window.open(ad.link, "_blank")
+    if (ad.type === "placeholder") {
+      router.push("/join")
+    } else {
+      window.open(ad.link, "_blank")
+    }
   }
 
   if (!visible) return null
 
-  // Create a 2D array for the grid layout with ads inserted
-  const createShowGridWithAds = (shows: Show[]) => {
-    const grid: (Show | "ezoic-ad" | "placeholder")[][] = [[], []]
-    
-    let currentPlaceholderIndex = 0;
+  // Create enhanced grid with proper distribution
+  const createEnhancedGrid = (shows: Show[], ads: Ad[]) => {
+    const grid: (Show | Ad)[][] = [[], []]
+    const allItems = [...shows]
 
-    // Insert shows into grid
-    shows.forEach((show, index) => {
-      const columnIndex = index % 2
-      grid[columnIndex].push(show)
+    const itemsWithAds: (Show | Ad)[] = []
 
-      // Insert Ezoic ad after every 4 shows (approximately)
-      if (index > 0 && index % 4 === 0 && currentPlaceholderIndex < scrollPlaceholders.length) {
-        // Insert into the opposite column for staggering effect
-        const oppositeColumn = columnIndex === 0 ? 1 : 0
-        grid[oppositeColumn].push("ezoic-ad")
-        currentPlaceholderIndex++;
+    allItems.forEach((show, index) => {
+      itemsWithAds.push(show)
+
+      // Insert ad every 4 shows
+      if ((index + 1) % 4 === 0 && ads.length > 0) {
+        const adIndex = Math.floor(index / 4) % ads.length
+        itemsWithAds.push(ads[adIndex])
       }
     })
 
-    // Ensure at least one ad in each column
-    if (!grid[0].some(item => typeof item === "string" && item === "ezoic-ad")) {
-      grid[0].splice(Math.min(2, grid[0].length), 0, "ezoic-ad")
+    // Add placeholder ads if we don't have enough content
+    while (itemsWithAds.length < 12) {
+      itemsWithAds.push({
+        id: `placeholder-${itemsWithAds.length}`,
+        imageUrl: "",
+        title: "Join BangerBoard",
+        description: "Become a member",
+        link: "/join",
+        type: "placeholder",
+      })
     }
 
-    if (!grid[1].some(item => typeof item === "string" && item === "ezoic-ad")) {
-      grid[1].splice(Math.min(2, grid[1].length), 0, "ezoic-ad")
-    }
+    // Distribute items across columns with staggering
+    itemsWithAds.forEach((item, index) => {
+      const columnIndex = index % 2
+      grid[columnIndex].push(item)
+    })
 
     return grid
   }
 
-  const showGrid = createShowGridWithAds(sortedShows)
+  const showGrid = createEnhancedGrid(sortedShows, mockAds)
+  const cardHeight = 360
+  const gap = 20
+  const totalContentHeight = Math.max(showGrid[0].length, showGrid[1].length) * (cardHeight + gap)
 
   return (
-    <div className="w-full h-[600px] overflow-y-hidden py-4" ref={scrollContainerRef}>
-      <div
-        className="grid grid-cols-2 gap-4"
-        style={{ height: `${Math.max(showGrid[0].length, showGrid[1].length) * 320}px` }}
-      >
-        {showGrid.map((column, colIndex) => (
-          <div
-            key={`col-${colIndex}`}
-            className="flex flex-col gap-4"
-            style={{ marginTop: colIndex === 1 ? "160px" : "0" }} // Stagger the second column
-          >
-            {column.map((item, itemIndex) => {
-              // Show card
-              if (typeof item !== "string" && "platform" in item) {
-                const show = item;
-                return (
-                  <Card
-                    key={`show-${show.id}`}
-                    className={`flex-shrink-0 overflow-hidden border-2 ${
-                      show.isLive ? "border-red-600" : "border-[#FF5F00]"
-                    } p-2 show-card group cursor-pointer`}
-                    onClick={() => handleCardClick(show)}
-                  >
-                    <CardContent className="p-0">
-                      <div className="relative">
-                        <div className="aspect-video relative">
-                          {show.videoId ? (
-                            <iframe
-                              src={`https://www.youtube.com/embed/${show.videoId}?rel=0&mute=1`}
-                              title={show.title}
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              className={`absolute top-0 left-0 w-full h-full ${
-                                show.isLive
-                                  ? "shadow-[0_0_15px_rgba(255,0,0,0.8)]"
-                                  : "shadow-[0_0_15px_rgba(255,60,0,0.6)]"
-                              } transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(255,60,0,0.8)]`}
-                            />
-                          ) : (
-                            <div className="absolute top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center">
-                              <div className="relative w-24 h-24">
-                                <Image
-                                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/BangerBoardImageLogo-SvaIEbajz66iZh24Mt6YMlohGEm9tm.png"
-                                  alt="BangerBoard Logo"
-                                  fill
-                                  className="object-contain animate-pulse-glow-slow"
-                                />
+    <div className="w-full overflow-hidden py-4 relative" style={{ height: `${containerHeight}px` }}>
+      <div ref={scrollContainerRef} className="h-full overflow-y-hidden" style={{ scrollBehavior: "auto" }}>
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 gap-5 px-2"
+          style={{
+            height: `${totalContentHeight * 2}px`, // Double height for seamless loop
+            minHeight: `${containerHeight * 2}px`,
+          }}
+        >
+          {showGrid.map((column, colIndex) => (
+            <div
+              key={`col-${colIndex}`}
+              className="flex flex-col gap-5"
+              style={{
+                marginTop: colIndex === 1 ? `${cardHeight / 3}px` : "0", // Stagger second column
+              }}
+            >
+              {[...column, ...column].map((item, itemIndex) => {
+                const isShow = "platform" in item
+                const isAd = "type" in item && item.type === "ad"
+                const isPlaceholder = "type" in item && item.type === "placeholder"
+
+                if (isShow) {
+                  const show = item as Show
+                  return (
+                    <Card
+                      key={`show-${show.id}-${itemIndex}`}
+                      className={`flex-shrink-0 overflow-hidden show-card group cursor-pointer bg-card ${
+                        show.isLive ? "ring-2 ring-red-500 ring-offset-2 ring-offset-background" : ""
+                      }`}
+                      style={{ height: `${cardHeight}px` }}
+                      onClick={() => handleCardClick(show)}
+                    >
+                      <CardContent className="p-0 h-full flex flex-col">
+                        <div className="relative flex-1">
+                          <div className="aspect-video relative overflow-hidden">
+                            {show.videoId ? (
+                              <iframe
+                                src={`https://www.youtube.com/embed/${show.videoId}?rel=0&mute=1&autoplay=0`}
+                                title={show.title}
+                                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="absolute top-0 left-0 w-full h-full transition-all duration-300 group-hover:scale-105"
+                              />
+                            ) : (
+                              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-muted to-background flex items-center justify-center">
+                                <div className="relative w-16 h-16">
+                                  <Image
+                                    src="/images/bangerboardimagelogo.png"
+                                    alt="BangerBoard Logo"
+                                    fill
+                                    className="object-contain opacity-50"
+                                  />
+                                </div>
                               </div>
-                            </div>
+                            )}
+                          </div>
+
+                          {show.isLive && (
+                            <Badge className="absolute top-3 right-3 bg-red-500 text-white border-0 live-pulse">
+                              <span className="relative flex h-2 w-2 mr-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                              </span>
+                              LIVE
+                            </Badge>
                           )}
-                        </div>
 
-                        {show.isLive && (
-                          <Badge className="absolute top-2 right-2 bg-red-600 text-white animate-pulse-slow">
-                            LIVE NOW
-                          </Badge>
-                        )}
-
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <PlatformIcon platform={show.platform} />
-                              <span className="text-white font-medium">{show.title}</span>
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-4">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <PlatformIcon platform={show.platform} />
+                                <span className="text-white font-medium text-sm truncate">{show.title}</span>
+                              </div>
+                              <FireRating rating={show.rating} />
                             </div>
-                            <FireRating rating={show.rating} />
                           </div>
                         </div>
-                      </div>
 
-                      <div className="p-4">
-                        <p className="text-sm text-muted-foreground mb-2">{show.description}</p>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3 mr-1" />
-                          <span>{show.nextShow}</span>
+                        <div className="p-4 flex-shrink-0 space-y-2">
+                          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                            {show.description}
+                          </p>
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              <span className="truncate">{show.nextShow}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-accent text-accent" />
+                              <span>{show.rating.toFixed(1)}</span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              }
-              // Ezoic ad placeholder
-              else if (typeof item === "string" && item === "ezoic-ad") {
-                const placeholderId = scrollPlaceholders[itemIndex % scrollPlaceholders.length];
-                return (
-                  <Card
-                    key={`ezoic-ad-${colIndex}-${itemIndex}`}
-                    className="flex-shrink-0 overflow-hidden border border-muted p-0"
-                  >
-                    <EzoicAd 
-                      id={placeholderId}
-                      className="aspect-video w-full"
-                      onAdLoaded={() => trackAdPlaceholder(placeholderId)}
-                    />
-                  </Card>
-                )
-              }
-              // Empty placeholder (shouldn't normally happen)
-              else {
-                return null;
-              }
-            })}
-          </div>
-        ))}
+                      </CardContent>
+                    </Card>
+                  )
+                } else if (isAd) {
+                  const ad = item as Ad
+                  return (
+                    <Card
+                      key={`ad-${ad.id}-${itemIndex}`}
+                      className="flex-shrink-0 overflow-hidden show-card group cursor-pointer bg-gradient-to-br from-accent/5 to-accent/10 border-accent/20"
+                      style={{ height: `${cardHeight}px` }}
+                      onClick={() => handleAdClick(ad)}
+                    >
+                      <CardContent className="p-0 h-full flex flex-col">
+                        <div className="relative flex-1">
+                          <div className="aspect-video relative bg-gradient-to-br from-accent/20 to-accent/40 flex items-center justify-center overflow-hidden">
+                            <Image
+                              src={ad.imageUrl || "/placeholder.svg"}
+                              alt={ad.title}
+                              fill
+                              className="object-cover opacity-80 group-hover:scale-110 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                            <div className="relative z-10 text-center text-white p-6">
+                              <h3 className="font-serif text-2xl mb-2">{ad.title}</h3>
+                              <p className="text-sm opacity-90">{ad.description}</p>
+                            </div>
+                          </div>
+                          <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground border-0">
+                            SPONSORED
+                          </Badge>
+                        </div>
+                        <div className="p-4 text-center">
+                          <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
+                            Learn More
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                } else {
+                  const placeholder = item as Ad
+                  return (
+                    <Card
+                      key={`placeholder-${itemIndex}`}
+                      className="flex-shrink-0 overflow-hidden show-card group cursor-pointer bg-gradient-to-br from-secondary to-muted"
+                      style={{ height: `${cardHeight}px` }}
+                      onClick={() => handleAdClick(placeholder)}
+                    >
+                      <CardContent className="p-0 h-full flex flex-col items-center justify-center">
+                        <div className="relative w-20 h-20 mb-4">
+                          <Image
+                            src="/images/bangerboardimagelogo.png"
+                            alt="BangerBoard Logo"
+                            fill
+                            className="object-contain opacity-30"
+                          />
+                        </div>
+                        <h3 className="font-serif text-xl mb-2">{placeholder.title}</h3>
+                        <p className="text-sm text-muted-foreground mb-4">{placeholder.description}</p>
+                        <Button variant="outline" className="mt-auto mb-4 bg-transparent">
+                          Join Now
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )
+                }
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
 }
-

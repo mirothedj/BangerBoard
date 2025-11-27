@@ -65,4 +65,3 @@ export function LikeButton({ initialLiked = false, profileId, profileType, size 
     </TooltipProvider>
   )
 }
-

@@ -213,4 +213,3 @@ export function extractTwitchUsername(url: string): string | null {
 
   return null
 }
-

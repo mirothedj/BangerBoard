@@ -1,21 +1,9 @@
 "use server"
 
-import { sql as vercelSql } from "@vercel/postgres"
-import { setupMockDatabase } from "./mock-db"
-
-// Check if we're in development mode
-const isDevelopment = process.env.NODE_ENV === "development"
-
-// Use real or mock SQL based on environment
-const sql = isDevelopment ? require("./mock-db").sql : vercelSql
+import { sql } from "@vercel/postgres"
 
 export async function setupDatabase() {
   try {
-    // If in development, use mock setup
-    if (isDevelopment) {
-      return await setupMockDatabase()
-    }
-
     // Create submissions table if it doesn't exist
     await sql`
       CREATE TABLE IF NOT EXISTS submissions (
@@ -23,8 +11,7 @@ export async function setupDatabase() {
         url TEXT NOT NULL,
         platform TEXT NOT NULL,
         submitted_at TIMESTAMP NOT NULL,
-        status TEXT NOT NULL,
-        meets_criteria BOOLEAN DEFAULT FALSE
+        status TEXT NOT NULL
       )
     `
 
@@ -38,4 +25,3 @@ export async function setupDatabase() {
     }
   }
 }
-

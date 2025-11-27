@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import AutoScrollShows from "@/components/auto-scroll-shows"
+import HorizontalScrollShows from "@/components/horizontal-scroll-shows"
 
 export default function HomeContent({ shows }: { shows: any[] }) {
   const [showAutoScroll, setShowAutoScroll] = useState(true)
@@ -14,10 +14,8 @@ export default function HomeContent({ shows }: { shows: any[] }) {
   }, [])
 
   return (
-    <>
-      {/* Only show the auto-scrolling section */}
-      {showAutoScroll && <AutoScrollShows shows={shows} visible={showAutoScroll} />}
-    </>
+    <div className="space-y-8">
+      <HorizontalScrollShows shows={shows} />
+    </div>
   )
 }
-

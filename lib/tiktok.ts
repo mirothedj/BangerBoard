@@ -120,4 +120,3 @@ export function extractTikTokUsername(url: string): string | null {
 
   return null
 }
-

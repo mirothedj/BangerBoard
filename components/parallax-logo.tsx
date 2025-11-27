@@ -10,7 +10,7 @@ export default function ParallaxLogo() {
         <div className="absolute w-full h-full max-w-[300px] max-h-[300px] bg-fire/20 blur-3xl rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse-slow"></div>
         <div className="relative z-[-10]">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/BangerBoardImageLogo-SvaIEbajz66iZh24Mt6YMlohGEm9tm.png"
+            src="/images/design-mode/BangerBoardImageLogo.png"
             alt="BangerBoard Logo"
             width={300}
             height={300}
@@ -22,4 +22,3 @@ export default function ParallaxLogo() {
     </>
   )
 }
-

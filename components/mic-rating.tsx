@@ -61,4 +61,3 @@ export function FireRating({ rating, interactive = false, onRatingChange }: MicR
 export function MicRating(props: MicRatingProps) {
   return <FireRating {...props} />
 }
-

@@ -1,76 +1,143 @@
-// Authentication utilities for Bangerboard
-import { createHash, randomBytes } from 'crypto';
+"use server"
 
-// Store tokens in memory (in a real app, these would be in a database)
-// Format: { submissionId: { token: string, expiresAt: Date } }
-const actionTokens: Record<string, { token: string, expiresAt: Date }> = {};
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 
-/**
- * Generates a secure action token for a submission
- * @param submissionId The ID of the submission
- * @returns The generated token and full action URLs
- */
-export async function generateActionToken(submissionId: string): Promise<{
-  token: string;
-  approveUrl: string;
-  disapproveUrl: string;
-  expiresAt: Date;
-}> {
-  // Generate a random token
-  const token = randomBytes(32).toString('hex');
-  
-  // Set expiration to 7 days from now
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7);
-  
-  // Store the token
-  actionTokens[submissionId] = {
-    token,
-    expiresAt
-  };
-  
-  // Generate action URLs
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const approveUrl = `${baseUrl}/api/submission-action?action=approve&id=${submissionId}&token=${token}`;
-  const disapproveUrl = `${baseUrl}/api/submission-action?action=disapprove&id=${submissionId}&token=${token}`;
-  
-  return {
-    token,
-    approveUrl,
-    disapproveUrl,
-    expiresAt
-  };
+export interface User {
+  id: string
+  username: string
+  email: string
+  profileType: "fan" | "host" | "artist"
+  isApproved: boolean
+  avatar?: string
+  bio?: string
+  socialLinks?: {
+    youtube?: string
+    twitch?: string
+    instagram?: string
+    tiktok?: string
+  }
+  createdAt: string
 }
 
-/**
- * Verifies an action token for a submission
- * @param submissionId The ID of the submission
- * @param token The token to verify
- * @returns Whether the token is valid
- */
-export async function verifyActionToken(submissionId: string, token: string): Promise<boolean> {
-  // Get the stored token
-  const storedToken = actionTokens[submissionId];
-  
-  // If no token exists or it's expired, return false
-  if (!storedToken || storedToken.token !== token || storedToken.expiresAt < new Date()) {
-    return false;
+// Mock user database - in a real app, this would be in your database
+const USERS: User[] = [
+  {
+    id: "1",
+    username: "djrhythm",
+    email: "dj@example.com",
+    profileType: "host",
+    isApproved: true,
+    avatar: "/placeholder.svg?height=150&width=150",
+    bio: "Hip-hop producer and music reviewer",
+    socialLinks: {
+      youtube: "UCnQ0T9b3q-WlKtEOkpnQprg",
+      twitch: "djrhythm",
+      instagram: "djrhythm",
+    },
+    createdAt: new Date().toISOString(),
+  },
+]
+
+export async function login(
+  email: string,
+  password: string,
+): Promise<{ success: boolean; user?: User; error?: string }> {
+  // Simulate authentication delay
+  await new Promise((resolve) => setTimeout(resolve, 1000))
+
+  // Find user by email
+  const user = USERS.find((u) => u.email === email)
+
+  if (!user) {
+    return { success: false, error: "User not found" }
   }
-  
-  // If we're in development mode, always return true for testing
-  if (process.env.NODE_ENV === 'development') {
-    return true;
+
+  // In a real app, you would verify the password hash
+  if (password !== "password123") {
+    return { success: false, error: "Invalid password" }
   }
-  
-  // Token is valid
-  return true;
+
+  // Set session cookie
+  cookies().set("session", JSON.stringify({ userId: user.id }), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 7, // 1 week
+  })
+
+  return { success: true, user }
 }
 
-/**
- * Creates a hash of a URL for duplicate checking
- * @param url The URL to hash
- * @returns The hashed URL
- */
-export function hashUrl(url: string): string {
-  return createHash('sha256').update(url.toLowerCase().trim()).digest('hex');
-} 
+export async function signup(userData: {
+  username: string
+  email: string
+  password: string
+  profileType: "fan" | "host" | "artist"
+}): Promise<{ success: boolean; user?: User; error?: string }> {
+  // Simulate signup delay
+  await new Promise((resolve) => setTimeout(resolve, 1000))
+
+  // Check if user already exists
+  const existingUser = USERS.find((u) => u.email === userData.email || u.username === userData.username)
+
+  if (existingUser) {
+    return { success: false, error: "User already exists" }
+  }
+
+  // Create new user
+  const newUser: User = {
+    id: (USERS.length + 1).toString(),
+    username: userData.username,
+    email: userData.email,
+    profileType: userData.profileType,
+    isApproved: userData.profileType === "fan", // Auto-approve fans, hosts need approval
+    createdAt: new Date().toISOString(),
+  }
+
+  USERS.push(newUser)
+
+  // Set session cookie
+  cookies().set("session", JSON.stringify({ userId: newUser.id }), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 7, // 1 week
+  })
+
+  return { success: true, user: newUser }
+}
+
+export async function logout(): Promise<void> {
+  cookies().delete("session")
+  redirect("/")
+}
+
+export async function getCurrentUser(): Promise<User | null> {
+  const sessionCookie = cookies().get("session")
+
+  if (!sessionCookie) {
+    return null
+  }
+
+  try {
+    const session = JSON.parse(sessionCookie.value)
+    const user = USERS.find((u) => u.id === session.userId)
+    return user || null
+  } catch {
+    return null
+  }
+}
+
+export async function updateUser(
+  userId: string,
+  updates: Partial<User>,
+): Promise<{ success: boolean; user?: User; error?: string }> {
+  const userIndex = USERS.findIndex((u) => u.id === userId)
+
+  if (userIndex === -1) {
+    return { success: false, error: "User not found" }
+  }
+
+  USERS[userIndex] = { ...USERS[userIndex], ...updates }
+
+  return { success: true, user: USERS[userIndex] }
+}
